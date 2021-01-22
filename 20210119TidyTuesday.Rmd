@@ -5,4 +5,22 @@ date: "22/01/2021"
 output: html_document
 ---
 
-hello world
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(sf)
+library(rKenyaCensus)
+```
+
+## Load and plot shape file
+
+```{r}
+kenyaShapeFile <- KenyaCounties_SHP
+
+kenyaShape <- st_as_sf(kenyaShapeFile) %>%
+  st_transform(crs = "+proj=longlat +datum=WGS84")
+
+ggplot() +
+  geom_sf(data = kenyaShape) +
+  coord_sf(crs = st_crs(4326))
+```
