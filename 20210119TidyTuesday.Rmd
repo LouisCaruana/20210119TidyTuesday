@@ -1,8 +1,10 @@
 ---
-title: "20210119TidyTuesday"
+title: "2021_W4_rKenyaCensus"
 author: "Louis Caruana"
 date: "22/01/2021"
-output: html_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +16,7 @@ library(rKenyaCensus)
 
 ## Load and plot shape file
 
-```{r}
+```{r message = FALSE}
 kenyaShapeFile <- KenyaCounties_SHP
 
 kenyaShape <- st_as_sf(kenyaShapeFile) %>%
@@ -23,4 +25,30 @@ kenyaShape <- st_as_sf(kenyaShapeFile) %>%
 ggplot() +
   geom_sf(data = kenyaShape) +
   coord_sf(crs = st_crs(4326))
+```
+
+## Explore data set
+
+
+The variables show the number of households carrying out different agricultural practices.
+```{r}
+AgriFishIrri <- V4_T2.20
+AgriFishIrri <- AgriFishIrri %>%
+  filter(FALSE == str_detect(AdminArea, 'Sub')) %>%
+  select(-SubCounty, -AdminArea) %>%
+  filter(County != 'xxx')
+AgriFishIrri
+```
+
+```{r}
+kenyaCombined <-
+  left_join(kenyaShape, AgriFishIrri,
+            by = c('County' = 'County'))
+kenyaCombined
+```
+```{r}
+ggplot() +
+  geom_sf(data = kenyaCombined) +
+  coord_sf(crs = st_crs(4326))
+
 ```
