@@ -152,7 +152,7 @@ patchwork <- (CropProduction | LivestockProduction)/
 
 patchwork + plot_annotation(title = "Distribution of Kenyan Households Carrying out\nDifferent Agricultural Practices",
   subtitle = "",
-  caption = "") &
+  caption = "@Louis_Caruana | Data: rKenyaCensus") &
   theme(plot.subtitle = element_text(size = 20)) &
   theme(plot.title = element_text(size = 35)) &
   theme(text = element_text('mono')) &
