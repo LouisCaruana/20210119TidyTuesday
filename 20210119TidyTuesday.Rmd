@@ -12,6 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(sf)
 library(rKenyaCensus)
+library(RColorBrewer)
+library(patchwork)
 ```
 
 ## Load and plot shape file
@@ -36,7 +38,13 @@ AgriFishIrri <- V4_T2.20
 AgriFishIrri <- AgriFishIrri %>%
   filter(FALSE == str_detect(AdminArea, 'Sub')) %>%
   select(-SubCounty, -AdminArea) %>%
-  filter(County != 'xxx')
+  filter(County != 'xxx') %>%
+  mutate(Farming = Farming/1000) %>%
+  mutate(CropProduction = CropProduction/1000) %>%
+  mutate(LivestockProduction = LivestockProduction/1000) %>%
+  mutate(Aquaculture = Aquaculture/1000) %>%
+  mutate(Fishing = Fishing/1000) %>%
+  mutate(Irrigation = Irrigation/1000)
 AgriFishIrri
 ```
 
@@ -44,11 +52,115 @@ AgriFishIrri
 kenyaCombined <-
   left_join(kenyaShape, AgriFishIrri,
             by = c('County' = 'County'))
-kenyaCombined
 ```
-```{r}
-ggplot() +
-  geom_sf(data = kenyaCombined) +
-  coord_sf(crs = st_crs(4326))
+
+```{r fig.width=9, fig.height=9}
+CropProduction <- ggplot(data = kenyaCombined) +
+  geom_sf(aes(fill = CropProduction), color = "grey70") +
+  theme_void() +
+  theme(legend.title = element_text(),
+        panel.background = element_rect(fill = "#F5F0EA",
+                                        colour = "#F5F0EA",
+                                        size = 0.5, linetype = "solid"),
+        plot.background = element_rect(fill = "#F5F0EA",
+                                       colour = "#F5F0EA",
+                                        size = 0.5, linetype = "solid"),
+        legend.position = c(0.94, 0.5)) +
+  scale_fill_gradient(low = "#F0EDEA",
+                      high = "#e41a1c",
+                      na.value = "transparent",
+                      name = "Thousand\nHouseholds") +
+  labs(title = "",
+              subtitle = "Crop Production",
+              caption = "") 
+```
+
+```{r fig.width=9, fig.height=9}
+LivestockProduction <- ggplot(data = kenyaCombined) +
+  geom_sf(aes(fill = LivestockProduction), color = "grey70") +
+  theme_void() +
+  theme(legend.title = element_text(),
+        panel.background = element_rect(fill = "#F5F0EA",
+                                        colour = "#F5F0EA",
+                                        size = 0.5, linetype = "solid"),
+        plot.background = element_rect(fill = "#F5F0EA",
+                                       colour = "#F5F0EA",
+                                        size = 0.5, linetype = "solid"),
+        legend.position = c(0.94, 0.5)) +
+  scale_fill_gradient(low = "#F0EDEA",
+                      high = "#377eb8",
+                      na.value = "transparent",
+                      name = "Thousand\nHouseholds") +
+  labs(title = "",
+              subtitle = "Livestock Production",
+              caption = "") 
 
 ```
+```{r fig.width=9, fig.height=9}
+Aquaculture <- ggplot(data = kenyaCombined) +
+  geom_sf(aes(fill = Aquaculture), color = "grey70") +
+  theme_void() +
+  theme(legend.title = element_text(),
+        panel.background = element_rect(fill = "#F5F0EA",
+                                        colour = "#F5F0EA",
+                                        size = 0.5, linetype = "solid"),
+        plot.background = element_rect(fill = "#F5F0EA",
+                                       colour = "#F5F0EA",
+                                        size = 0.5, linetype = "solid"),
+        legend.position = c(0.94, 0.5)) +
+  scale_fill_gradient(low = "#F0EDEA",
+                      high = "#4daf4a",
+                      na.value = "transparent",
+                      name = "Thousand\nHouseholds") +
+  labs(title = "",
+              subtitle = "Aquaculture",
+              caption = "") 
+
+```
+```{r fig.width=9, fig.height=9}
+Fishing <- ggplot(data = kenyaCombined) +
+  geom_sf(aes(fill = Fishing), color = "grey70") +
+  theme_void() +
+  theme(legend.title = element_text(),
+        panel.background = element_rect(fill = "#F5F0EA",
+                                        colour = "#F5F0EA",
+                                        size = 0.5, linetype = "solid"),
+        plot.background = element_rect(fill = "#F5F0EA",
+                                       colour = "#F5F0EA",
+                                        size = 0.5, linetype = "solid"),
+        legend.position = c(0.94, 0.5)) +
+  scale_fill_gradient(low = "#F0EDEA",
+                      high = "#984ea3",
+                      na.value = "transparent",
+                      name = "Thousand\nHouseholds") +
+  labs(title = "",
+              subtitle = "Fishing",
+              caption = "") 
+
+
+
+
+```
+
+
+
+
+```{r fig.width=15, fig.height=20}
+
+patchwork <- (CropProduction | LivestockProduction)/
+              (Aquaculture | Fishing)
+
+patchwork + plot_annotation(title = "Distribution of Kenyan Households Carrying out\nDifferent Agricultural Practices",
+  subtitle = "",
+  caption = "") &
+  theme(plot.subtitle = element_text(size = 20)) &
+  theme(plot.title = element_text(size = 35)) &
+  theme(text = element_text('mono')) &
+  theme(plot.background = element_rect(color  = '#F5F0EA', fill = '#F5F0EA'))
+
+ggsave('2021_W4_rKenyaCensus.png')
+```
+
+
+
+
