@@ -159,6 +159,7 @@ patchwork + plot_annotation(title = "Distribution of Kenyan Households Carrying 
   theme(plot.background = element_rect(color  = '#F5F0EA', fill = '#F5F0EA'))
 
 ggsave('2021_W4_rKenyaCensus.png')
+
 ```
 
 
